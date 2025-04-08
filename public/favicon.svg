@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <style>
+    :root {
+      color-scheme: light dark;
+    }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #1e1e1e; }
+      .fg { stroke: #4ade80; fill: #4ade80; }
+    }
+    @media (prefers-color-scheme: light) {
+      .bg { fill: #ffffff; }
+      .fg { stroke: #22c55e; fill: #22c55e; }
+    }
+  </style>
+  <rect width="24" height="24" rx="4" fill="#1e1e1e"/>
+  <path d="M7 12a5 5 0 0110 0" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="7" cy="12" r="1.5" fill="#4ade80"/>
+  <circle cx="17" cy="12" r="1.5" fill="#4ade80"/>
+  <path d="M12 4v4M12 16v4" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+</svg>

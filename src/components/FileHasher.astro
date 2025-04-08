@@ -1,0 +1,209 @@
+---
+import Footer from '../components/Footer.astro';
+---
+
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 flex flex-col">
+  <div class="max-w-4xl mx-auto flex-grow">
+    <div class="text-center">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+        File Hash Calculator
+      </h1>
+      <p class="mt-3 text-lg text-gray-500 dark:text-gray-400">
+        Calculate SHA-256 hashes of your files directly in the browser
+      </p>
+    </div>
+
+    <div class="mt-8">
+      <div 
+        id="dropZone"
+        class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-lg cursor-pointer hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
+      >
+        <div class="space-y-1 text-center">
+          <svg
+            class="mx-auto h-12 w-12 text-gray-400"
+            stroke="currentColor"
+            fill="none"
+            viewBox="0 0 48 48"
+            aria-hidden="true"
+          >
+            <path
+              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            <label
+              for="file-upload"
+              class="relative cursor-pointer rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 focus-within:outline-none"
+            >
+              <span>Upload files</span>
+              <input
+                id="file-upload"
+                type="file"
+                multiple
+                class="sr-only"
+              />
+            </label>
+            <p class="pl-1">or drag and drop</p>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            All processing is done locally in your browser
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 rounded-lg hidden" id="resultsTable">
+        <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-6">File Name</th>
+              <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Extension</th>
+              <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">SHA-256 Hash</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900" id="resultsBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 flex justify-end space-x-4 hidden" id="actionButtons">
+        <button
+          type="button"
+          id="copyButton"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Copy to Clipboard
+        </button>
+        <button
+          type="button"
+          id="downloadButton"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Download CSV
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <Footer />
+
+</div>
+
+<script>
+interface FileResult {
+  name: string;
+  extension: string;
+  hash: string;
+}
+
+const results: FileResult[] = [];
+
+async function calculateHash(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function getFileNameAndExtension(filename: string): [string, string] {
+  const lastDotIndex = filename.lastIndexOf('.');
+  if (lastDotIndex === -1) return [filename, ''];
+  return [
+    filename.substring(0, lastDotIndex),
+    filename.substring(lastDotIndex + 1)
+  ];
+}
+
+function updateTable() {
+  const tbody = document.getElementById('resultsBody')!;
+  const table = document.getElementById('resultsTable')!;
+  const actionButtons = document.getElementById('actionButtons')!;
+  
+  tbody.innerHTML = results.map(result => `
+    <tr>
+      <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400 font-mono">${result.hash}</td>
+      <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-200 sm:pl-6">${result.name}</td>
+      <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">${result.extension}</td>
+    </tr>
+  `).join('');
+
+  if (results.length > 0) {
+    table.classList.remove('hidden');
+    actionButtons.classList.remove('hidden');
+  } else {
+    table.classList.add('hidden');
+    actionButtons.classList.add('hidden');
+  }
+}
+
+async function handleFiles(files: FileList) {
+  for (const file of files) {
+    const hash = await calculateHash(file);
+    const [name, extension] = getFileNameAndExtension(file.name);
+    results.push({ name, extension, hash });
+  }
+  updateTable();
+}
+
+function downloadCSV() {
+  const csv = [
+    ['SHA-256 Hash', 'File Name', 'Extension'],
+    ...results.map(r => [r.hash, r.name, r.extension])
+  ].map(row => row.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'file-hashes.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function copyToClipboard() {
+  const text = results.map(r => `${r.hash}: ${r.name}.${r.extension}`).join('\n');
+  await navigator.clipboard.writeText(text);
+  
+  const copyButton = document.getElementById('copyButton')!;
+  const originalText = copyButton.textContent;
+  copyButton.textContent = 'Copied!';
+  setTimeout(() => {
+    copyButton.textContent = originalText;
+  }, 2000);
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+  const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+  const dropZone = document.getElementById('dropZone')!;
+  const downloadButton = document.getElementById('downloadButton')!;
+  const copyButton = document.getElementById('copyButton')!;
+
+  fileInput.addEventListener('change', (e) => {
+    const files = (e.target as HTMLInputElement).files;
+    if (files) handleFiles(files);
+  });
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-indigo-500');
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('border-indigo-500');
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-indigo-500');
+    const files = e.dataTransfer?.files;
+    if (files) handleFiles(files);
+  });
+
+  downloadButton.addEventListener('click', downloadCSV);
+  copyButton.addEventListener('click', copyToClipboard);
+});
+</script>
