@@ -37,7 +37,7 @@ If you're a developer and want to run the project from source:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/simpleproof/simple-proof-filehash.git
+   git clone https://github.com/Simple-Proof/simple-proof-filehash.git
    ```
 
 2. Navigate to the project directory:
@@ -83,4 +83,4 @@ If you're a developer and want to run the project from source:
 
 ## License
 
-This project is open source and available on GitHub at [https://github.com/simpleproof/simple-proof-filehash](https://github.com/simpleproof/simple-proof-filehash)
+This project is open source and available on GitHub at [https://github.com/Simple-Proof/simple-proof-filehash](https://github.com/Simple-Proof/simple-proof-filehash)
