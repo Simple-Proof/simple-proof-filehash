@@ -3,8 +3,26 @@ import Footer from '../components/Footer.astro';
 ---
 
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 flex flex-col">
-  <div class="max-w-4xl mx-auto flex-grow">
-    <div class="text-center">
+  <div class="max-w-4xl mx-auto flex-grow relative">
+    <!-- Theme toggle button in top right corner -->
+    <div class="absolute right-0 top-0">
+      <button
+        id="theme-toggle"
+        class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
+        aria-label="Toggle dark mode"
+      >
+        <!-- Sun icon for dark mode -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+        </svg>
+        <!-- Moon icon for light mode -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="text-center mt-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
         Hash List Generator
       </h1>
@@ -36,7 +54,7 @@ import Footer from '../components/Footer.astro';
           <div class="text-sm text-gray-600 dark:text-gray-400">
             <label
               for="file-upload"
-              class="relative cursor-pointer rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 focus-within:outline-none"
+              class="relative cursor-pointer rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 focus-within:outline-none"
             >
               <span>Browse files</span>
               <input
@@ -52,6 +70,12 @@ import Footer from '../components/Footer.astro';
             All processing is done locally in your browser
           </p>
         </div>
+      </div>
+
+      <!-- Debugging indicator (hidden by default) -->
+      <div id="debugInfo" class="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm hidden">
+        <p class="font-medium mb-1">Drag & Drop Debug Info:</p>
+        <div id="debugText" class="font-mono text-xs"></div>
       </div>
 
       <div class="mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 rounded-lg hidden" id="resultsTable">
@@ -72,11 +96,11 @@ import Footer from '../components/Footer.astro';
       <div class="mt-6 flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 sm:space-x-4 hidden" id="actionButtons">
         <div class="flex flex-grow max-w-xs">
           <div class="relative flex-grow">
-            <label for="filename" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filename</label>
+            <label for="filenameInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filename</label>
             <input 
               type="text" 
               id="filenameInput" 
-              class="block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2" 
+              class="block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2" 
             />
           </div>
         </div>
@@ -84,21 +108,21 @@ import Footer from '../components/Footer.astro';
           <button
             type="button"
             id="clearAllButton"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
           >
             Clear All
           </button>
           <button
             type="button"
             id="copyButton"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
           >
             Copy to Clipboard
           </button>
           <button
             type="button"
             id="downloadButton"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
           >
             Download CSV
           </button>
@@ -120,6 +144,24 @@ interface FileResult {
 }
 
 const results: FileResult[] = [];
+let debugMode = false; // Set to true to enable debugging
+
+// Debug helper function
+function debugLog(message: string) {
+  if (!debugMode) return;
+  
+  console.log(message);
+  
+  const debugText = document.getElementById('debugText');
+  const debugInfo = document.getElementById('debugInfo');
+  
+  if (debugText && debugInfo) {
+    debugInfo.classList.remove('hidden');
+    const timestamp = new Date().toLocaleTimeString();
+    debugText.innerHTML += `[${timestamp}] ${message}<br>`;
+    debugText.scrollTop = debugText.scrollHeight;
+  }
+}
 
 function generateTimeBasedHex(): string {
   // Create a compact hexadecimal code based on current date and time
@@ -145,10 +187,17 @@ function generateDefaultFilename(): string {
 }
 
 async function calculateHash(file: File): Promise<string> {
-  const buffer = await file.arrayBuffer();
-  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  try {
+    // Create a Blob from the file to ensure access
+    const fileBlob = new Blob([file], { type: file.type });
+    const buffer = await fileBlob.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (error) {
+    console.error('Error in calculateHash:', error);
+    throw error;
+  }
 }
 
 function getFileNameAndExtension(filename: string): [string, string] {
@@ -175,7 +224,7 @@ function updateTable() {
       <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">${result.extension}</td>
       <td class="whitespace-nowrap py-4 px-2 text-center">
         <button 
-          class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 remove-file inline-flex items-center justify-center w-6 h-6 rounded-full hover:bg-red-100 dark:hover:bg-red-900 focus:outline-none transition-colors" 
+          class="text-danger-600 hover:text-danger-800 dark:text-danger-400 dark:hover:text-danger-300 remove-file inline-flex items-center justify-center w-6 h-6 rounded-full hover:bg-danger-100 dark:hover:bg-danger-900 focus:outline-none transition-colors" 
           data-id="${result.id}"
           title="Remove file"
         >
@@ -231,18 +280,38 @@ function resetFilenameInput() {
   filenameInput.value = generateDefaultFilename();
 }
 
-async function handleFiles(files: FileList) {
-  for (const file of files) {
+// Process each file individually
+async function processFile(file: File) {
+  debugLog(`Processing file: ${file.name} (${file.size} bytes)`);
+  
+  try {
     const hash = await calculateHash(file);
     const [name, extension] = getFileNameAndExtension(file.name);
+    
     results.push({ 
       name, 
       extension, 
       hash,
       id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     });
+    
+    debugLog(`Hash calculated for ${file.name}: ${hash.substring(0, 8)}...`);
+    updateTable(); // Update table after each file
+  } catch (error) {
+    debugLog(`Error processing file ${file.name}: ${error}`);
+    console.error('Error processing file:', file.name, error);
   }
-  updateTable();
+}
+
+// Handle multiple files from input or drop
+async function handleFiles(files: FileList) {
+  debugLog(`Processing ${files.length} files`);
+  
+  // Convert FileList to Array for safer processing
+  const fileArray = Array.from(files);
+  for (const file of fileArray) {
+    await processFile(file);
+  }
 }
 
 function downloadCSV() {
@@ -290,6 +359,8 @@ async function copyToClipboard() {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+  debugLog('DOM loaded - initializing application');
+  
   const fileInput = document.getElementById('file-upload') as HTMLInputElement;
   const dropZone = document.getElementById('dropZone')!;
   const downloadButton = document.getElementById('downloadButton')!;
@@ -300,29 +371,94 @@ document.addEventListener('DOMContentLoaded', () => {
   // Set default filename
   resetFilenameInput();
 
+  // Make the entire drop zone clickable to open file dialog
+  dropZone.addEventListener('click', (e) => {
+    // Only trigger if not clicking on the label/input directly
+    const target = e.target as HTMLElement;
+    if (!target.closest('label')) {
+      debugLog('Drop zone clicked - opening file dialog');
+      fileInput.click();
+    }
+  });
+
   fileInput.addEventListener('change', (e) => {
     const files = (e.target as HTMLInputElement).files;
-    if (files) handleFiles(files);
+    if (files && files.length > 0) {
+      debugLog(`File input changed - ${files.length} files selected`);
+      handleFiles(files);
+    }
   });
 
-  dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.classList.add('border-indigo-500');
-  });
+  // Set up drag and drop with counter pattern
+  setupDragAndDrop();
 
-  dropZone.addEventListener('dragleave', () => {
-    dropZone.classList.remove('border-indigo-500');
-  });
-
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('border-indigo-500');
-    const files = e.dataTransfer?.files;
-    if (files) handleFiles(files);
-  });
+  function setupDragAndDrop() {
+    debugLog('Setting up drag and drop handlers');
+    
+    let dragCounter = 0;
+    
+    // Prevent defaults at document level
+    document.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    }, false);
+    
+    document.addEventListener('drop', (e) => {
+      e.preventDefault();
+    }, false);
+    
+    // Track enter/leave with counter
+    dropZone.addEventListener('dragenter', (e) => {
+      e.preventDefault();
+      dragCounter++;
+      debugLog(`Drag enter - counter: ${dragCounter}`);
+      dropZone.classList.add('border-primary-500');
+    }, false);
+    
+    dropZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dragCounter--;
+      debugLog(`Drag leave - counter: ${dragCounter}`);
+      if (dragCounter === 0) {
+        dropZone.classList.remove('border-primary-500');
+      }
+    }, false);
+    
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    }, false);
+    
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dragCounter = 0;
+      dropZone.classList.remove('border-primary-500');
+      
+      debugLog('Drop event detected');
+      if (e.dataTransfer) {
+        debugLog(`DataTransfer available - files: ${e.dataTransfer.files.length}`);
+        
+        if (e.dataTransfer.files.length > 0) {
+          // Convert FileList to Array for safer processing
+          const fileArray = Array.from(e.dataTransfer.files);
+          const fileNames = fileArray.map(f => f.name).join(', ');
+          debugLog(`Files dropped: ${fileNames}`);
+          
+          // Process each file individually
+          fileArray.forEach(file => {
+            processFile(file);
+          });
+        } else {
+          debugLog('No files in the drop event');
+        }
+      } else {
+        debugLog('No dataTransfer in the drop event');
+      }
+    }, false);
+  }
 
   downloadButton.addEventListener('click', downloadCSV);
   copyButton.addEventListener('click', copyToClipboard);
   clearAllButton.addEventListener('click', clearResults);
+  
+  debugLog('Application initialized successfully');
 });
 </script>
