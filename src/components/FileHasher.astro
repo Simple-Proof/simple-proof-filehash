@@ -44,15 +44,18 @@ import Footer from '../components/Footer.astro';
               </svg>
               <p class="text-text-secondary mb-2">Drag and drop your files here</p>
               <p class="text-text-lighter text-sm mb-3">OR</p>
-              <button id="browseButton" class="bg-primary hover:bg-primary-shade text-white py-2 px-4 rounded text-sm transition-colors font-ibm-medium">
+              <label
+                for="file-upload"
+                class="browse-button bg-primary hover:bg-primary-shade text-white py-2 px-4 rounded text-sm transition-colors font-ibm-medium inline-block cursor-pointer"
+              >
                 Browse Files
-              </button>
-              <input
-                id="file-upload"
-                type="file"
-                multiple
-                class="sr-only"
-              />
+                <input
+                  id="file-upload"
+                  type="file"
+                  multiple
+                  class="sr-only"
+                />
+              </label>
             </div>
           </div>
         </div>
@@ -81,7 +84,7 @@ import Footer from '../components/Footer.astro';
               <div class="md:col-span-5">File Name</div>
               <div class="hidden md:block md:col-span-1">Extension</div>
             </div>
-            <div class="col-span-1 text-center">Actions</div>
+            <div class="col-span-1 text-center hidden md:block">Actions</div>
           </div>
 
           <!-- Table Body -->
@@ -411,7 +414,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const copyButton = document.getElementById('copyButton')!;
   const clearAllButton = document.getElementById('clearAllButton')!;
   const filenameInput = document.getElementById('filenameInput') as HTMLInputElement;
-  const browseButton = document.getElementById('browseButton')!;
 
   // Set default filename
   resetFilenameInput();
@@ -420,17 +422,14 @@ document.addEventListener('DOMContentLoaded', () => {
   dropZone.addEventListener('click', (e) => {
     // Only trigger if not clicking on the label/input directly
     const target = e.target as HTMLElement;
-    if (!target.closest('button')) {
+    const label = target.closest('label');
+    if (!label) {
       debugLog('Drop zone clicked - opening file dialog');
       fileInput.click();
     }
   });
   
-  // Browse button click
-  browseButton.addEventListener('click', () => {
-    fileInput.click();
-  });
-
+  // File input change handler
   fileInput.addEventListener('change', (e) => {
     const files = (e.target as HTMLInputElement).files;
     if (files && files.length > 0) {
