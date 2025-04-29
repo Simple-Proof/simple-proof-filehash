@@ -1,25 +1,50 @@
 ---
 ---
 
- <footer class="mt-16 max-w-4xl mx-auto w-full">
-    <div class="border-t border-gray-200 dark:border-gray-700 py-8">
-      <div class="text-center text-sm text-gray-600 dark:text-gray-400 space-y-4">
-        <p>
-          Created by <a href="https://simpleproof.com" class="text-primary-600 dark:text-primary-400 hover:text-primary-500" target="_blank" rel="noopener noreferrer">Simple Proof</a>
+<footer class="mt-16 max-w-4xl mx-auto w-full">
+  <div class="border-t border-border-light py-8">
+    <div class="text-center text-sm text-text-light space-y-4">
+      <p>
+        Created by <a href="https://simpleproof.com" class="text-primary hover:text-primary-shade" target="_blank" rel="noopener noreferrer">Simple Proof</a>
+      </p>
+      <p>
+        This is an open-source project. View the source code on 
+        <a href="https://github.com/Simple-Proof/simple-proof-filehash" class="text-primary hover:text-primary-shade" target="_blank" rel="noopener noreferrer">GitHub</a>.
+      </p>
+      <div class="max-w-2xl mx-auto">
+        <h2 class="text-lg font-ibm-semibold text-text-dark mb-2">Security & Privacy</h2>
+        <p class="mb-2">
+          All file processing is performed locally in your browser. No data is ever uploaded to any server, ensuring complete privacy and security of your files.
         </p>
         <p>
-          This is an open-source project. View the source code on 
-          <a href="https://github.com/Simple-Proof/simple-proof-filehash" class="text-primary-600 dark:text-primary-400 hover:text-primary-500" target="_blank" rel="noopener noreferrer">GitHub</a>.
+          For enhanced security, you can save this page and use it offline. The application will continue to work without an internet connection.
         </p>
-        <div class="max-w-2xl mx-auto">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-2">Security & Privacy</h2>
-          <p class="mb-2">
-            All file processing is performed locally in your browser. No data is ever uploaded to any server, ensuring complete privacy and security of your files.
-          </p>
-          <p>
-            For enhanced security, you can save this page and use it offline. The application will continue to work without an internet connection.
-          </p>
-        </div>
       </div>
     </div>
-  </footer>
+  </div>
+</footer>
+
+<style>
+footer {
+  font-family: 'IBM-Regular', sans-serif;
+}
+
+footer a {
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+footer h2 {
+  font-family: 'IBM-SemiBold', sans-serif;
+}
+
+@media (max-width: 576px) {
+  footer {
+    padding: 0 1rem;
+  }
+}
+</style>

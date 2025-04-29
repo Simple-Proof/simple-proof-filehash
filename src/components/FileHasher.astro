@@ -2,105 +2,115 @@
 import Footer from '../components/Footer.astro';
 ---
 
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 flex flex-col">
-  <div class="max-w-4xl mx-auto flex-grow relative">
-    <!-- Theme toggle button in top right corner -->
-    <div class="absolute right-0 top-0">
-      <button
-        id="theme-toggle"
-        class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
-        aria-label="Toggle dark mode"
-      >
-        <!-- Sun icon for dark mode -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
-        </svg>
-        <!-- Moon icon for light mode -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-        </svg>
-      </button>
+<div class="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 flex flex-col">
+  <div class="max-w-4xl mx-auto flex-grow w-full">
+    <div class="logo-container flex justify-center mb-5 pt-[60px] md:pt-[30px] md:mb-8">
+      <img src="/logo.svg" alt="Simple Proof Logo" class="h-[30px] md:h-[40px] w-auto">
     </div>
-
     <div class="text-center mt-8">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+      <h1 class="text-3xl font-ibm-bold text-primary sm:text-4xl">
         Hash List Generator
       </h1>
-      <p class="mt-3 text-lg text-gray-500 dark:text-gray-400">
+      <p class="mt-3 text-lg text-text-secondary">
         Calculate SHA-256 hashes of your files directly in the browser
       </p>
     </div>
 
     <div class="mt-8">
-      <div 
-        id="dropZone"
-        class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-lg cursor-pointer hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
-      >
-        <div class="space-y-1 text-center">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            stroke="currentColor"
-            fill="none"
-            viewBox="0 0 48 48"
-            aria-hidden="true"
-          >
-            <path
-              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          <div class="text-sm text-gray-600 dark:text-gray-400">
-            <label
-              for="file-upload"
-              class="relative cursor-pointer rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 focus-within:outline-none"
+      <!-- Upload card -->
+      <div class="bg-white rounded-lg shadow-light p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center">
+          <!-- Left side with icon and text -->
+          <div class="md:w-1/3 mb-4 md:mb-0">
+            <div class="flex items-center mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-tertiary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <h2 class="text-primary font-ibm-semibold text-xl">Upload Files</h2>
+            </div>
+            <p class="text-text-light text-sm">
+              Add files to generate SHA-256 hashes.<br>All processing happens locally in your browser for maximum security.
+            </p>
+          </div>
+
+          <!-- Right side with drop zone -->
+          <div class="md:w-2/3 md:pl-4">
+            <div 
+              id="dropZone"
+              class="border-2 border-dashed border-border-medium rounded-lg p-6 cursor-pointer text-center hover:border-primary transition-colors"
             >
-              <span>Browse files</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-8 w-8 text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              <p class="text-text-secondary mb-2">Drag and drop your files here</p>
+              <p class="text-text-lighter text-sm mb-3">OR</p>
+              <button id="browseButton" class="bg-primary hover:bg-primary-shade text-white py-2 px-4 rounded text-sm transition-colors font-ibm-medium">
+                Browse Files
+              </button>
               <input
                 id="file-upload"
                 type="file"
                 multiple
                 class="sr-only"
               />
-            </label>
-            <p class="pl-1">or drag and drop</p>
+            </div>
           </div>
-          <p class="text-xs text-gray-500 dark:text-gray-400">
-            All processing is done locally in your browser
-          </p>
         </div>
       </div>
 
-      <!-- Debugging indicator (hidden by default) -->
-      <div id="debugInfo" class="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm hidden">
-        <p class="font-medium mb-1">Drag & Drop Debug Info:</p>
+      <!-- Debug info (hidden by default) -->
+      <div id="debugInfo" class="mt-4 p-3 bg-background-light dark:bg-gray-800 rounded-md text-sm hidden">
+        <p class="font-ibm-medium mb-1">Drag & Drop Debug Info:</p>
         <div id="debugText" class="font-mono text-xs"></div>
       </div>
 
-      <div class="mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 rounded-lg hidden" id="resultsTable">
-        <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">SHA-256 Hash</th>
-              <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-6">File Name</th>
-              <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Extension</th>
-              <th class="w-12 px-2 py-3.5 text-center text-sm font-semibold text-gray-900 dark:text-gray-200">Del</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900" id="resultsBody">
-          </tbody>
-        </table>
+      <!-- Results Card -->
+      <div class="bg-white rounded-lg shadow-light overflow-hidden">
+        <div class="p-4 flex items-center border-b border-border-light">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h2 class="text-text font-ibm-medium text-lg">File Hashes</h2>
+        </div>
+
+        <!-- Table Headers -->
+        <div class="hidden" id="resultsTable">
+          <div class="grid grid-cols-12 bg-background-light text-sm font-ibm-medium text-text-dark p-3">
+            <div class="col-span-11 md:col-span-10 grid grid-cols-1 md:grid-cols-12 gap-1 md:gap-0">
+              <div class="md:col-span-6">SHA-256 Hash</div>
+              <div class="md:col-span-5">File Name</div>
+              <div class="hidden md:block md:col-span-1">Extension</div>
+            </div>
+            <div class="col-span-1 text-center">Actions</div>
+          </div>
+
+          <!-- Table Body -->
+          <div class="divide-y divide-border-light" id="resultsBody">
+            <!-- Results will be inserted here dynamically -->
+          </div>
+        </div>
+
+          <!-- Table Body -->
+          <div class="divide-y divide-border-light" id="resultsBody">
+            <!-- Results will be inserted here dynamically -->
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="py-12 text-center text-text-light">
+          No files processed yet. Add files to see their hashes.
+        </div>
       </div>
 
+      <!-- Action Buttons -->
       <div class="mt-6 flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 sm:space-x-4 hidden" id="actionButtons">
         <div class="flex flex-grow max-w-xs">
           <div class="relative flex-grow">
-            <label for="filenameInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filename</label>
+            <label for="filenameInput" class="block text-sm font-ibm-medium text-text-dark dark:text-gray-300 mb-1">Filename</label>
             <input 
               type="text" 
               id="filenameInput" 
-              class="block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2" 
+              class="block w-full rounded-md border-border-medium dark:border-gray-700 shadow-sm focus:border-primary focus:ring-primary text-sm bg-white dark:bg-gray-800 text-text-dark dark:text-gray-100 px-3 py-2" 
             />
           </div>
         </div>
@@ -108,21 +118,21 @@ import Footer from '../components/Footer.astro';
           <button
             type="button"
             id="clearAllButton"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            class="inline-flex items-center px-4 py-2 border border-border-medium dark:border-gray-700 shadow-sm text-sm font-ibm-medium rounded-md text-text-dark dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-background-light dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
           >
             Clear All
           </button>
           <button
             type="button"
             id="copyButton"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            class="inline-flex items-center px-4 py-2 border border-border-medium dark:border-gray-700 shadow-sm text-sm font-ibm-medium rounded-md text-text-dark dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-background-light dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
           >
             Copy to Clipboard
           </button>
           <button
             type="button"
             id="downloadButton"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-ibm-medium rounded-md text-white bg-tertiary hover:bg-tertiary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tertiary"
           >
             Download CSV
           </button>
@@ -213,25 +223,37 @@ function updateTable() {
   const tbody = document.getElementById('resultsBody')!;
   const table = document.getElementById('resultsTable')!;
   const actionButtons = document.getElementById('actionButtons')!;
+  const emptyState = document.getElementById('emptyState')!;
   
   tbody.innerHTML = results.map(result => `
-    <tr data-id="${result.id}">
-      <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 dark:text-gray-400 font-mono">
-        <div>${result.hash.substring(0, 32)}</div>
-        <div>${result.hash.substring(32)}</div>
-      </td>
-      <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-200 sm:pl-6">${result.name}</td>
-      <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">${result.extension}</td>
-      <td class="whitespace-nowrap py-4 px-2 text-center">
+    <div data-id="${result.id}" class="grid grid-cols-12 py-3 px-3 items-center hover:bg-background-light transition-colors">
+      <!-- Mobile optimization: Stack hash and filename in small screens -->
+      <div class="col-span-11 md:col-span-10 grid grid-cols-1 md:grid-cols-12 gap-1 md:gap-0">
+        <!-- Hash (full width on mobile, proper column on desktop) -->
+        <div class="md:col-span-6 font-mono text-xs text-text-secondary overflow-hidden">
+          ${result.hash.substring(0, 16)}...${result.hash.substring(result.hash.length - 16)}
+        </div>
+        
+        <!-- Filename (full width on mobile, proper column on desktop) -->
+        <div class="md:col-span-5 text-text-dark truncate">
+          ${result.name}${result.extension ? '.'+result.extension : ''}
+        </div>
+        
+        <!-- Extension (desktop only) -->
+        <div class="hidden md:block md:col-span-1 text-text-light">${result.extension}</div>
+      </div>
+      
+      <!-- Delete button (always right-aligned) -->
+      <div class="col-span-1 md:col-span-1 text-center">
         <button 
-          class="text-danger-600 hover:text-danger-800 dark:text-danger-400 dark:hover:text-danger-300 remove-file inline-flex items-center justify-center w-6 h-6 rounded-full hover:bg-danger-100 dark:hover:bg-danger-900 focus:outline-none transition-colors" 
+          class="text-danger hover:text-danger-shade focus:outline-none remove-file" 
           data-id="${result.id}"
           title="Remove file"
         >
-          <span class="text-xl font-bold leading-none pointer-events-none">×</span>
+          <span class="text-lg font-bold leading-none">×</span>
         </button>
-      </td>
-    </tr>
+      </div>
+    </div>
   `).join('');
 
   // Add event listeners to remove buttons
@@ -253,9 +275,11 @@ function updateTable() {
   if (results.length > 0) {
     table.classList.remove('hidden');
     actionButtons.classList.remove('hidden');
+    emptyState.classList.add('hidden');
   } else {
     table.classList.add('hidden');
     actionButtons.classList.add('hidden');
+    emptyState.classList.remove('hidden');
   }
 }
 
@@ -338,6 +362,9 @@ function downloadCSV() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   
+  // Show success message
+  showSuccessToast('File downloaded successfully!');
+  
   // Clear results after download
   clearResults();
 }
@@ -349,11 +376,28 @@ async function copyToClipboard() {
   }).join('\n');
   await navigator.clipboard.writeText(text);
   
+  showSuccessToast('Copied to clipboard!');
+  
   const copyButton = document.getElementById('copyButton')!;
   const originalText = copyButton.textContent;
   copyButton.textContent = 'Copied!';
   setTimeout(() => {
     copyButton.textContent = originalText;
+  }, 2000);
+}
+
+// Simple toast message function
+function showSuccessToast(message: string) {
+  const toast = document.createElement('div');
+  toast.className = 'fixed bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-md shadow-md z-50 toast-success';
+  toast.innerText = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+    setTimeout(() => {
+      document.body.removeChild(toast);
+    }, 300);
   }, 2000);
 }
 
@@ -367,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const copyButton = document.getElementById('copyButton')!;
   const clearAllButton = document.getElementById('clearAllButton')!;
   const filenameInput = document.getElementById('filenameInput') as HTMLInputElement;
+  const browseButton = document.getElementById('browseButton')!;
 
   // Set default filename
   resetFilenameInput();
@@ -375,10 +420,15 @@ document.addEventListener('DOMContentLoaded', () => {
   dropZone.addEventListener('click', (e) => {
     // Only trigger if not clicking on the label/input directly
     const target = e.target as HTMLElement;
-    if (!target.closest('label')) {
+    if (!target.closest('button')) {
       debugLog('Drop zone clicked - opening file dialog');
       fileInput.click();
     }
+  });
+  
+  // Browse button click
+  browseButton.addEventListener('click', () => {
+    fileInput.click();
   });
 
   fileInput.addEventListener('change', (e) => {
@@ -386,6 +436,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (files && files.length > 0) {
       debugLog(`File input changed - ${files.length} files selected`);
       handleFiles(files);
+      
+      // Add visual feedback
+      dropZone.classList.add('bg-[rgba(0,26,114,0.03)]', 'border-primary');
+      setTimeout(() => {
+        dropZone.classList.remove('bg-[rgba(0,26,114,0.03)]', 'border-primary');
+      }, 500);
     }
   });
 
@@ -411,7 +467,8 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       dragCounter++;
       debugLog(`Drag enter - counter: ${dragCounter}`);
-      dropZone.classList.add('border-primary-500');
+      dropZone.classList.add('border-primary');
+      dropZone.classList.add('bg-[rgba(0,26,114,0.03)]');
     }, false);
     
     dropZone.addEventListener('dragleave', (e) => {
@@ -419,7 +476,8 @@ document.addEventListener('DOMContentLoaded', () => {
       dragCounter--;
       debugLog(`Drag leave - counter: ${dragCounter}`);
       if (dragCounter === 0) {
-        dropZone.classList.remove('border-primary-500');
+        dropZone.classList.remove('border-primary');
+        dropZone.classList.remove('bg-[rgba(0,26,114,0.03)]');
       }
     }, false);
     
@@ -430,7 +488,8 @@ document.addEventListener('DOMContentLoaded', () => {
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dragCounter = 0;
-      dropZone.classList.remove('border-primary-500');
+      dropZone.classList.remove('border-primary');
+      dropZone.classList.remove('bg-[rgba(0,26,114,0.03)]');
       
       debugLog('Drop event detected');
       if (e.dataTransfer) {
@@ -459,6 +518,45 @@ document.addEventListener('DOMContentLoaded', () => {
   copyButton.addEventListener('click', copyToClipboard);
   clearAllButton.addEventListener('click', clearResults);
   
+  // Show empty state initially and hide results table
+  const resultsTable = document.getElementById('resultsTable')!;
+  const actionButtons = document.getElementById('actionButtons')!;
+  const emptyState = document.getElementById('emptyState')!;
+  
+  resultsTable.classList.add('hidden');
+  actionButtons.classList.add('hidden');
+  emptyState.classList.remove('hidden');
+  
   debugLog('Application initialized successfully');
 });
 </script>
+
+<style>
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.toast-success {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+/* Custom transition for removing toast */
+.opacity-0 {
+  opacity: 0;
+}
+
+.transition-opacity {
+  transition: opacity 0.3s ease;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
+}
+</style>
