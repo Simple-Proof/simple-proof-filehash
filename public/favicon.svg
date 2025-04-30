@@ -1,20 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <style>
-    :root {
-      color-scheme: light dark;
-    }
-    @media (prefers-color-scheme: dark) {
-      .bg { fill: #1e1e1e; }
-      .fg { stroke: #4ade80; fill: #4ade80; }
-    }
-    @media (prefers-color-scheme: light) {
-      .bg { fill: #ffffff; }
-      .fg { stroke: #22c55e; fill: #22c55e; }
-    }
-  </style>
-  <rect width="24" height="24" rx="4" fill="#1e1e1e"/>
-  <path d="M7 12a5 5 0 0110 0" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="7" cy="12" r="1.5" fill="#4ade80"/>
-  <circle cx="17" cy="12" r="1.5" fill="#4ade80"/>
-  <path d="M12 4v4M12 16v4" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_1"
+   version="1.1"
+   viewBox="0 0 492.10001 575.79999"
+   width="492.10001"
+   height="575.79999"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <!-- Generator: Adobe Illustrator 29.0.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 186)  -->
+  <defs
+     id="defs1">
+    <style
+       id="style1">
+      .st0 {
+        fill: #fff;
+      }
+
+      .st1 {
+        fill: #f88e2b;
+      }
+    </style>
+  </defs>
+  <g
+     id="g13"
+     transform="translate(-159.5,-152.1)">
+    <polygon
+       class="st0"
+       points="651.6,294.5 405.3,440.4 296.6,375.6 296.6,459.1 404.9,524.2 651.6,378.5 651.6,294.6 "
+       id="polygon12" />
+    <polygon
+       class="st1"
+       points="592.1,259.8 405.5,152.1 159.5,294.1 159.5,583.1 405.5,727.9 651.6,583.1 651.6,447.1 579.7,489.4 579.7,542 405.5,644.5 231.3,542 231.3,335.6 405.5,235 520.9,301.7 "
+       id="polygon13" />
+  </g>
 </svg>
