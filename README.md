@@ -1,4 +1,4 @@
-# File Hash Calculator TESTING!!
+# File Hash Calculator
 
 A simple, secure browser-based tool for calculating SHA-256 hashes of files. This application runs entirely in your browser, ensuring complete privacy as your files never leave your computer.
 
