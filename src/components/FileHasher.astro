@@ -29,7 +29,9 @@ import Footer from '../components/Footer.astro';
               <h2 class="text-primary font-ibm-semibold text-xl">Upload Files</h2>
             </div>
             <p class="text-text-light text-sm">
-              Add files to generate SHA-256 hashes.<br>All processing happens locally in your browser for maximum security.
+              Add files to generate SHA-256 hashes.<br>
+              <span class="text-xs text-text-lighter">Maximum 1000 files.</span><br>
+              All processing happens locally in your browser for maximum security.
             </p>
           </div>
 
@@ -61,6 +63,39 @@ import Footer from '../components/Footer.astro';
         </div>
       </div>
 
+      <!-- Progress Card (initially hidden) -->
+      <div id="progressCard" class="bg-white rounded-lg shadow-light p-6 mb-6 hidden">
+        <div class="flex items-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary mr-2 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <h2 class="text-primary font-ibm-semibold text-xl">Processing Files</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-sm text-text-secondary mb-1">
+              <span id="progressText">Processing files...</span>
+              <span id="progressNumbers">0 / 0</span>
+            </div>
+            <div class="w-full bg-background-light rounded-full h-2">
+              <div id="progressBar" class="bg-primary h-2 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+            </div>
+          </div>
+          
+          <div id="currentFileInfo" class="text-sm text-text-light">
+            <span id="currentFileName">Preparing...</span>
+          </div>
+          
+          <div class="text-xs text-text-lighter">
+            <div class="flex justify-between">
+              <span>Files processed: <span id="processedCount" class="font-mono">0</span></span>
+              <span>Files remaining: <span id="remainingCount" class="font-mono">0</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Debug info (hidden by default) -->
       <div id="debugInfo" class="mt-4 p-3 bg-background-light dark:bg-gray-800 rounded-md text-sm hidden">
         <p class="font-ibm-medium mb-1">Drag & Drop Debug Info:</p>
@@ -69,11 +104,30 @@ import Footer from '../components/Footer.astro';
 
       <!-- Results Card -->
       <div class="bg-white rounded-lg shadow-light overflow-hidden">
-        <div class="p-4 flex items-center border-b border-border-light">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <h2 class="text-text font-ibm-medium text-lg">File Hashes</h2>
+
+        <div class="p-4 flex items-center justify-between border-b border-border-light">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h2 class="text-text font-ibm-medium text-lg">File Hashes</h2>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div id="fileCounter" class="text-sm text-text-secondary hidden">
+              <span id="fileCount">0</span> files processed
+            </div>
+            <!-- Items per page selector -->
+            <div id="itemsPerPageSelector" class="hidden">
+              <label for="itemsPerPage" class="text-sm text-text-secondary mr-2">Show:</label>
+              <select id="itemsPerPage" class="text-sm border border-border-medium rounded px-2 py-1 focus:border-primary focus:ring-1 focus:ring-primary">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="all">All</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <!-- Table Headers -->
@@ -102,6 +156,41 @@ import Footer from '../components/Footer.astro';
         <!-- Empty state -->
         <div id="emptyState" class="py-12 text-center text-text-light">
           No files processed yet. Add files to see their hashes.
+        </div>
+
+        <!-- Pagination -->
+        <div id="paginationContainer" class="hidden border-t border-border-light bg-background-light px-4 py-3">
+          <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0">
+            <div class="flex items-center text-sm text-text-secondary order-2 md:order-1">
+              <span id="paginationInfo">Showing 0 to 0 of 0 results</span>
+            </div>
+            <div class="flex items-center space-x-2 order-1 md:order-2">
+              <button 
+                id="prevButton" 
+                class="flex items-center px-1 md:px-3 py-2 md:py-1 text-sm border border-border-medium rounded-lg md:rounded hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[70px] md:min-w-0 justify-center"
+                disabled
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                <span class="md:inline hidden">Previous</span>
+              </button>
+              
+              <div id="pageNumbers" class="flex items-center space-x-1">
+                <!-- Page numbers will be inserted here -->
+              </div>
+              
+              <button 
+                id="nextButton" 
+                class="flex items-center px-1 md:px-3 py-2 md:py-1 text-sm border border-border-medium rounded-lg md:rounded hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[70px] md:min-w-0 justify-center"
+              >
+                <span class="md:inline hidden">Next</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -157,7 +246,42 @@ interface FileResult {
 }
 
 const results: FileResult[] = [];
-let debugMode = false; // Set to true to enable debugging
+let debugMode = false;
+let isProcessing = false;
+const MAX_FILES = 1000;
+
+// Progress tracking
+let totalFiles = 0;
+let processedFiles = 0;
+
+// Pagination state
+let currentPage = 1;
+let itemsPerPage = 10; // Default for desktop
+let totalPages = 1;
+
+// Function to get responsive items per page
+function getDefaultItemsPerPage(): number {
+  return window.innerWidth < 768 ? 10 : 50; // 10 for mobile, 50 for desktop
+}
+
+// Function to set initial items per page based on screen size
+function initializeItemsPerPage() {
+  const defaultItems = getDefaultItemsPerPage();
+  itemsPerPage = defaultItems;
+  
+  const itemsPerPageSelect = document.getElementById('itemsPerPage') as HTMLSelectElement;
+  if (itemsPerPageSelect) {
+    // Clear all selections first
+    Array.from(itemsPerPageSelect.options).forEach(option => option.selected = false);
+    // Set the appropriate default
+    const optionToSelect = itemsPerPageSelect.querySelector(`option[value="${defaultItems}"]`) as HTMLOptionElement;
+    if (optionToSelect) {
+      optionToSelect.selected = true;
+    }
+  }
+  
+  debugLog(`Items per page initialized: ${itemsPerPage} (default: ${defaultItems})`);
+}
 
 // Debug helper function
 function debugLog(message: string) {
@@ -177,21 +301,17 @@ function debugLog(message: string) {
 }
 
 function generateTimeBasedHex(): string {
-  // Create a compact hexadecimal code based on current date and time
   const now = new Date();
   
-  // Extract date components
-  const year = now.getFullYear() % 100; // Last 2 digits of year
-  const month = now.getMonth() + 1;     // Months are 0-11
+  const year = now.getFullYear() % 100;
+  const month = now.getMonth() + 1;
   const day = now.getDate();
   const hour = now.getHours();
   const minute = now.getMinutes();
   const secondFraction = Math.floor((now.getSeconds() * 1000 + now.getMilliseconds()) / (1000 * 60 / 256));
   
-  // Combine into a single number
   const combined = (year << 20) | (month << 16) | (day << 11) | (hour << 6) | minute;
   
-  // Convert to hex and add seconds/ms
   return combined.toString(16).padStart(6, '0') + secondFraction.toString(16).padStart(2, '0');
 }
 
@@ -199,9 +319,52 @@ function generateDefaultFilename(): string {
   return `SimpleProofHashList_${generateTimeBasedHex()}`;
 }
 
+// Progress UI functions
+function showProgress() {
+  const progressCard = document.getElementById('progressCard')!;
+  const dropZone = document.getElementById('dropZone')!;
+  
+  progressCard.classList.remove('hidden');
+  dropZone.style.opacity = '0.5';
+  dropZone.style.pointerEvents = 'none';
+  isProcessing = true;
+}
+
+function hideProgress() {
+  const progressCard = document.getElementById('progressCard')!;
+  const dropZone = document.getElementById('dropZone')!;
+  
+  progressCard.classList.add('hidden');
+  dropZone.style.opacity = '1';
+  dropZone.style.pointerEvents = 'auto';
+  isProcessing = false;
+}
+
+function updateProgress(current: number, total: number, currentFileName: string = '') {
+  const progressBar = document.getElementById('progressBar')!;
+  const progressText = document.getElementById('progressText')!;
+  const progressNumbers = document.getElementById('progressNumbers')!;
+  const currentFileInfo = document.getElementById('currentFileName')!;
+  const processedCount = document.getElementById('processedCount')!;
+  const remainingCount = document.getElementById('remainingCount')!;
+  
+  const percentage = total > 0 ? (current / total) * 100 : 0;
+  
+  progressBar.style.width = `${percentage}%`;
+  progressText.textContent = current === total ? 'Processing complete!' : 'Processing files...';
+  progressNumbers.textContent = `${current} / ${total}`;
+  processedCount.textContent = current.toString();
+  remainingCount.textContent = (total - current).toString();
+  
+  if (currentFileName) {
+    currentFileInfo.textContent = `Current: ${currentFileName}`;
+  } else if (current === total) {
+    currentFileInfo.textContent = 'All files processed successfully!';
+  }
+}
+
 async function calculateHash(file: File): Promise<string> {
   try {
-    // Create a Blob from the file to ensure access
     const fileBlob = new Blob([file], { type: file.type });
     const buffer = await fileBlob.arrayBuffer();
     const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
@@ -227,26 +390,47 @@ function updateTable() {
   const table = document.getElementById('resultsTable')!;
   const actionButtons = document.getElementById('actionButtons')!;
   const emptyState = document.getElementById('emptyState')!;
+  const fileCounter = document.getElementById('fileCounter')!;
+  const fileCount = document.getElementById('fileCount')!;
+  const itemsPerPageSelector = document.getElementById('itemsPerPageSelector')!;
+  const paginationContainer = document.getElementById('paginationContainer')!;
   
-  tbody.innerHTML = results.map(result => `
+  const totalResults = results.length;
+  
+  // Debug current state
+  debugLog(`updateTable called: totalResults=${totalResults}, itemsPerPage=${itemsPerPage}, currentPage=${currentPage}`);
+  
+  // Calculate pagination FIRST
+  totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalResults / itemsPerPage);
+  
+  // Ensure current page is valid BEFORE calculating indices
+  if (currentPage > totalPages && totalPages > 0) {
+    currentPage = totalPages;
+  } else if (currentPage < 1) {
+    currentPage = 1;
+  }
+  
+  // Now calculate the display indices
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = itemsPerPage === -1 ? totalResults : Math.min(startIndex + itemsPerPage, totalResults);
+  const paginatedResults = itemsPerPage === -1 ? results : results.slice(startIndex, endIndex);
+  
+  debugLog(`Pagination calculated: totalPages=${totalPages}, startIndex=${startIndex}, endIndex=${endIndex}, showing=${paginatedResults.length} items`);
+  
+  tbody.innerHTML = paginatedResults.map(result => `
     <div data-id="${result.id}" class="grid grid-cols-12 py-3 px-3 items-center hover:bg-background-light transition-colors">
-      <!-- Mobile optimization: Stack hash and filename in small screens -->
       <div class="col-span-11 md:col-span-10 grid grid-cols-1 md:grid-cols-12 gap-1 md:gap-0">
-        <!-- Hash (full width on mobile, proper column on desktop) -->
         <div class="md:col-span-6 font-mono text-xs text-text-secondary overflow-hidden">
           ${result.hash.substring(0, 16)}...${result.hash.substring(result.hash.length - 16)}
         </div>
         
-        <!-- Filename (full width on mobile, proper column on desktop) -->
         <div class="md:col-span-5 text-text-dark truncate">
           ${result.name}${result.extension ? '.'+result.extension : ''}
         </div>
         
-        <!-- Extension (desktop only) -->
         <div class="hidden md:block md:col-span-1 text-text-light">${result.extension}</div>
       </div>
       
-      <!-- Delete button (always right-aligned) -->
       <div class="col-span-1 md:col-span-1 text-center">
         <button 
           class="text-danger hover:text-danger-shade focus:outline-none remove-file" 
@@ -264,8 +448,6 @@ function updateTable() {
     button.addEventListener('click', (e) => {
       let target = e.target as HTMLElement;
       
-      // If the clicked element is the span inside the button,
-      // find the parent button that has the data-id
       if (!target.hasAttribute('data-id') && target.parentElement) {
         target = target.closest('[data-id]') || target;
       }
@@ -275,14 +457,129 @@ function updateTable() {
     });
   });
 
-  if (results.length > 0) {
+  // Update file counter
+  fileCount.textContent = totalResults.toString();
+
+  if (totalResults > 0) {
     table.classList.remove('hidden');
     actionButtons.classList.remove('hidden');
     emptyState.classList.add('hidden');
+    fileCounter.classList.remove('hidden');
+    itemsPerPageSelector.classList.remove('hidden');
+    
+    // Show pagination only if needed
+    if (totalPages > 1 || totalResults > Math.min(10, 25)) {
+      paginationContainer.classList.remove('hidden');
+      updatePagination();
+    } else {
+      paginationContainer.classList.add('hidden');
+    }
   } else {
     table.classList.add('hidden');
     actionButtons.classList.add('hidden');
     emptyState.classList.remove('hidden');
+    fileCounter.classList.add('hidden');
+    itemsPerPageSelector.classList.add('hidden');
+    paginationContainer.classList.add('hidden');
+    currentPage = 1;
+  }
+}
+
+function updatePagination() {
+  const paginationInfo = document.getElementById('paginationInfo')!;
+  const prevButton = document.getElementById('prevButton')! as HTMLButtonElement;
+  const nextButton = document.getElementById('nextButton')! as HTMLButtonElement;
+  const pageNumbers = document.getElementById('pageNumbers')!;
+  
+  const totalResults = results.length;
+  const startIndex = (currentPage - 1) * itemsPerPage + 1;
+  const endIndex = itemsPerPage === -1 ? totalResults : Math.min(currentPage * itemsPerPage, totalResults);
+  
+  // Update pagination info
+  if (totalResults === 0) {
+    paginationInfo.textContent = 'No results';
+  } else if (itemsPerPage === -1) {
+    paginationInfo.textContent = `Showing all ${totalResults} results`;
+  } else {
+    paginationInfo.textContent = `Showing ${startIndex} to ${endIndex} of ${totalResults} results`;
+  }
+  
+  // Update buttons
+  prevButton.disabled = currentPage <= 1;
+  nextButton.disabled = currentPage >= totalPages || itemsPerPage === -1;
+  
+  // Generate page numbers
+  pageNumbers.innerHTML = '';
+  
+  if (itemsPerPage !== -1 && totalPages > 1) {
+    const maxVisiblePages = 2;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    // Adjust start if we're near the end
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    // First page + ellipsis
+    if (startPage > 1) {
+      pageNumbers.appendChild(createPageButton(1, false));
+      if (startPage > 2) {
+        const ellipsis = document.createElement('span');
+        ellipsis.textContent = '...';
+        ellipsis.className = 'px-2 py-1 text-sm text-text-light';
+        pageNumbers.appendChild(ellipsis);
+      }
+    }
+    
+    // Visible pages
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.appendChild(createPageButton(i, i === currentPage));
+    }
+    
+    // Last page + ellipsis
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const ellipsis = document.createElement('span');
+        ellipsis.textContent = '...';
+        ellipsis.className = 'px-2 py-1 text-sm text-text-light';
+        pageNumbers.appendChild(ellipsis);
+      }
+      pageNumbers.appendChild(createPageButton(totalPages, false));
+    }
+  }
+}
+
+function createPageButton(pageNum: number, isActive: boolean, isMobile: boolean = false): HTMLButtonElement {
+  const button = document.createElement('button');
+  button.textContent = pageNum.toString();
+  
+  if (isMobile) {
+    button.className = `px-2 py-1 text-xs border rounded transition-colors min-w-[28px] max-w-[32px] ${
+      isActive 
+        ? 'bg-primary text-white border-primary' 
+        : 'border-border-medium hover:bg-white hover:border-primary'
+    }`;
+  } else {
+    button.className = `px-3 py-1 text-sm border rounded transition-colors ${
+      isActive 
+        ? 'bg-primary text-white border-primary' 
+        : 'border-border-medium hover:bg-white hover:border-primary'
+    }`;
+  }
+  
+  if (!isActive) {
+    button.addEventListener('click', () => goToPage(pageNum));
+  }
+  
+  return button;
+}
+
+function goToPage(page: number) {
+  if (page >= 1 && page <= totalPages) {
+    currentPage = page;
+    debugLog(`Going to page: ${page}/${totalPages}`);
+    updateTable();
   }
 }
 
@@ -298,6 +595,7 @@ function removeFile(id: string | null) {
 
 function clearResults() {
   results.length = 0;
+  currentPage = 1;
   updateTable();
   resetFilenameInput();
 }
@@ -307,9 +605,12 @@ function resetFilenameInput() {
   filenameInput.value = generateDefaultFilename();
 }
 
-// Process each file individually
-async function processFile(file: File) {
-  debugLog(`Processing file: ${file.name} (${file.size} bytes)`);
+// Process each file individually with progress updates
+async function processFile(file: File, index: number) {
+  debugLog(`Processing file ${index + 1}/${totalFiles}: ${file.name} (${file.size} bytes)`);
+  
+  // Update progress to show current file
+  updateProgress(index, totalFiles, file.name);
   
   try {
     const hash = await calculateHash(file);
@@ -323,21 +624,101 @@ async function processFile(file: File) {
     });
     
     debugLog(`Hash calculated for ${file.name}: ${hash.substring(0, 8)}...`);
-    updateTable(); // Update table after each file
+    
+    // Update progress
+    processedFiles++;
+    updateProgress(processedFiles, totalFiles, processedFiles < totalFiles ? 'Processing next file...' : '');
+    
+    // Update table after each file (but throttle updates for better performance)
+    if (processedFiles % 10 === 0 || processedFiles === totalFiles) {
+      updateTable();
+      
+      // Ensure itemsPerPage stays correct during processing
+      if (processedFiles === totalFiles) {
+        debugLog(`Final processing check - itemsPerPage: ${itemsPerPage}, results: ${results.length}`);
+      }
+    }
+    
+    // Small delay to prevent UI blocking
+    if (processedFiles % 50 === 0) {
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+    
   } catch (error) {
     debugLog(`Error processing file ${file.name}: ${error}`);
     console.error('Error processing file:', file.name, error);
+    processedFiles++;
+    
+    // Show error toast
+    showErrorToast(`Error processing ${file.name}`);
   }
 }
 
-// Handle multiple files from input or drop
+// Handle multiple files with progress
 async function handleFiles(files: FileList) {
-  debugLog(`Processing ${files.length} files`);
-  
-  // Convert FileList to Array for safer processing
+  if (isProcessing) {
+    showWarningToast('Files are already being processed. Please wait...');
+    return;
+  }
+
   const fileArray = Array.from(files);
-  for (const file of fileArray) {
-    await processFile(file);
+  const currentCount = results.length;
+  const newFilesCount = fileArray.length;
+  
+  // Check file limit
+  if (currentCount + newFilesCount > MAX_FILES) {
+    const allowedFiles = MAX_FILES - currentCount;
+    if (allowedFiles <= 0) {
+      showErrorToast(`Maximum limit of ${MAX_FILES} files reached. Please clear existing files first.`);
+      return;
+    }
+    
+    showWarningToast(`Only processing first ${allowedFiles} files. Maximum limit is ${MAX_FILES} files.`);
+    fileArray.splice(allowedFiles);
+  }
+  
+  if (fileArray.length === 0) {
+    return;
+  }
+
+  debugLog(`Starting to process ${fileArray.length} files`);
+  
+  // Initialize progress
+  totalFiles = fileArray.length;
+  processedFiles = 0;
+  
+  showProgress();
+  updateProgress(0, totalFiles);
+  
+  try {
+    // Process files sequentially to avoid overwhelming the browser
+    for (let i = 0; i < fileArray.length; i++) {
+      await processFile(fileArray[i], i);
+    }
+    
+    // Final update to ensure everything is in sync
+    updateTable();
+    updateProgress(totalFiles, totalFiles);
+    
+    // Force refresh pagination to ensure correct display
+    setTimeout(() => {
+      updateTable();
+    }, 100);
+    
+    // Show completion message
+    showSuccessToast(`Successfully processed ${totalFiles} file${totalFiles > 1 ? 's' : ''}!`);
+    
+    debugLog(`Processing complete. Total results: ${results.length}, Current page: ${currentPage}, Total pages: ${totalPages}, Items per page: ${itemsPerPage}`);
+    
+    // Hide progress after a short delay
+    setTimeout(() => {
+      hideProgress();
+    }, 1500);
+    
+  } catch (error) {
+    console.error('Error in handleFiles:', error);
+    showErrorToast('An error occurred while processing files');
+    hideProgress();
   }
 }
 
@@ -365,10 +746,7 @@ function downloadCSV() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   
-  // Show success message
   showSuccessToast('File downloaded successfully!');
-  
-  // Clear results after download
   clearResults();
 }
 
@@ -389,19 +767,40 @@ async function copyToClipboard() {
   }, 2000);
 }
 
-// Simple toast message function
-function showSuccessToast(message: string) {
+// Toast message functions
+function showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') {
   const toast = document.createElement('div');
-  toast.className = 'fixed bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-md shadow-md z-50 toast-success';
+  const colors = {
+    success: 'bg-green-500',
+    error: 'bg-red-500',
+    warning: 'bg-yellow-500',
+    info: 'bg-primary'
+  };
+  
+  toast.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-4 py-2 rounded-md shadow-md z-50 toast-${type}`;
   toast.innerText = message;
   document.body.appendChild(toast);
   
   setTimeout(() => {
     toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
     setTimeout(() => {
-      document.body.removeChild(toast);
+      if (document.body.contains(toast)) {
+        document.body.removeChild(toast);
+      }
     }, 300);
-  }, 2000);
+  }, type === 'error' ? 4000 : 2000);
+}
+
+function showSuccessToast(message: string) {
+  showToast(message, 'success');
+}
+
+function showErrorToast(message: string) {
+  showToast(message, 'error');
+}
+
+function showWarningToast(message: string) {
+  showToast(message, 'warning');
 }
 
 // Event Listeners
@@ -414,13 +813,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const copyButton = document.getElementById('copyButton')!;
   const clearAllButton = document.getElementById('clearAllButton')!;
   const filenameInput = document.getElementById('filenameInput') as HTMLInputElement;
+  const itemsPerPageSelect = document.getElementById('itemsPerPage') as HTMLSelectElement;
+  const prevButton = document.getElementById('prevButton')!;
+  const nextButton = document.getElementById('nextButton')!;
+  const prevButtonMobile = document.getElementById('prevButtonMobile')!;
+  const nextButtonMobile = document.getElementById('nextButtonMobile')!;
+  const mobilePageSelect = document.getElementById('mobilePageSelect') as HTMLSelectElement;;
 
-  // Set default filename
   resetFilenameInput();
 
-  // Make the entire drop zone clickable to open file dialog
   dropZone.addEventListener('click', (e) => {
-    // Only trigger if not clicking on the label/input directly
+    if (isProcessing) {
+      showWarningToast('Please wait for current processing to complete');
+      return;
+    }
+    
     const target = e.target as HTMLElement;
     const label = target.closest('label');
     if (!label) {
@@ -429,14 +836,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
-  // File input change handler
   fileInput.addEventListener('change', (e) => {
     const files = (e.target as HTMLInputElement).files;
     if (files && files.length > 0) {
       debugLog(`File input changed - ${files.length} files selected`);
       handleFiles(files);
       
-      // Add visual feedback
       dropZone.classList.add('bg-[rgba(0,26,114,0.03)]', 'border-primary');
       setTimeout(() => {
         dropZone.classList.remove('bg-[rgba(0,26,114,0.03)]', 'border-primary');
@@ -444,7 +849,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Set up drag and drop with counter pattern
   setupDragAndDrop();
 
   function setupDragAndDrop() {
@@ -452,7 +856,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let dragCounter = 0;
     
-    // Prevent defaults at document level
     document.addEventListener('dragover', (e) => {
       e.preventDefault();
     }, false);
@@ -461,9 +864,10 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
     }, false);
     
-    // Track enter/leave with counter
     dropZone.addEventListener('dragenter', (e) => {
       e.preventDefault();
+      if (isProcessing) return;
+      
       dragCounter++;
       debugLog(`Drag enter - counter: ${dragCounter}`);
       dropZone.classList.add('border-primary');
@@ -472,6 +876,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     dropZone.addEventListener('dragleave', (e) => {
       e.preventDefault();
+      if (isProcessing) return;
+      
       dragCounter--;
       debugLog(`Drag leave - counter: ${dragCounter}`);
       if (dragCounter === 0) {
@@ -486,44 +892,127 @@ document.addEventListener('DOMContentLoaded', () => {
     
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
+      if (isProcessing) {
+        showWarningToast('Please wait for current processing to complete');
+        return;
+      }
+      
       dragCounter = 0;
       dropZone.classList.remove('border-primary');
       dropZone.classList.remove('bg-[rgba(0,26,114,0.03)]');
       
       debugLog('Drop event detected');
-      if (e.dataTransfer) {
+      if (e.dataTransfer && e.dataTransfer.files.length > 0) {
         debugLog(`DataTransfer available - files: ${e.dataTransfer.files.length}`);
-        
-        if (e.dataTransfer.files.length > 0) {
-          // Convert FileList to Array for safer processing
-          const fileArray = Array.from(e.dataTransfer.files);
-          const fileNames = fileArray.map(f => f.name).join(', ');
-          debugLog(`Files dropped: ${fileNames}`);
-          
-          // Process each file individually
-          fileArray.forEach(file => {
-            processFile(file);
-          });
-        } else {
-          debugLog('No files in the drop event');
-        }
+        handleFiles(e.dataTransfer.files);
       } else {
-        debugLog('No dataTransfer in the drop event');
+        debugLog('No files in the drop event');
       }
     }, false);
   }
 
   downloadButton.addEventListener('click', downloadCSV);
   copyButton.addEventListener('click', copyToClipboard);
-  clearAllButton.addEventListener('click', clearResults);
+  clearAllButton.addEventListener('click', () => {
+    if (isProcessing) {
+      showWarningToast('Cannot clear files while processing. Please wait...');
+      return;
+    }
+    clearResults();
+  });
+
+  // Pagination event listeners
+  itemsPerPageSelect.addEventListener('change', (e) => {
+    const value = (e.target as HTMLSelectElement).value;
+    const newItemsPerPage = value === 'all' ? -1 : parseInt(value);
+    
+    // Calculate what the new current page should be to keep roughly the same position
+    if (itemsPerPage !== -1 && newItemsPerPage !== -1) {
+      const currentFirstItem = (currentPage - 1) * itemsPerPage + 1;
+      currentPage = Math.max(1, Math.ceil(currentFirstItem / newItemsPerPage));
+    } else {
+      currentPage = 1;
+    }
+    
+    itemsPerPage = newItemsPerPage;
+    updateTable();
+  });
+
+  // Pagination buttons
+  if (prevButton) {
+    prevButton.addEventListener('click', () => {
+      if (currentPage > 1) {
+        goToPage(currentPage - 1);
+      }
+    });
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        goToPage(currentPage + 1);
+      }
+    });
+  }
+
+  // Handle window resize to adjust items per page
+  window.addEventListener('resize', () => {
+    const newDefault = getDefaultItemsPerPage();
+    const currentIsDefault = (itemsPerPage === 10) || (itemsPerPage === 50);
+    
+    // Only auto-adjust if user is using default values (not custom selection)
+    if (currentIsDefault && newDefault !== itemsPerPage && itemsPerPage !== -1) {
+      // Calculate what the new current page should be to maintain position
+      if (results.length > 0) {
+        const currentFirstItem = (currentPage - 1) * itemsPerPage + 1;
+        currentPage = Math.max(1, Math.ceil(currentFirstItem / newDefault));
+      }
+      
+      itemsPerPage = newDefault;
+      
+      // Update select to reflect change
+      Array.from(itemsPerPageSelect.options).forEach(option => option.selected = false);
+      const optionToSelect = itemsPerPageSelect.querySelector(`option[value="${newDefault}"]`) as HTMLOptionElement;
+      if (optionToSelect) {
+        optionToSelect.selected = true;
+      }
+      
+      updateTable();
+    }
+  });
+
+  // Keyboard navigation for pagination
+  document.addEventListener('keydown', (e) => {
+    if (results.length === 0 || itemsPerPage === -1) return;
+    
+    // Only handle pagination shortcuts when not focused on input elements
+    const activeElement = document.activeElement;
+    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT')) {
+      return;
+    }
+
+    if (e.key === 'ArrowLeft' && currentPage > 1) {
+      e.preventDefault();
+      goToPage(currentPage - 1);
+    } else if (e.key === 'ArrowRight' && currentPage < totalPages) {
+      e.preventDefault();
+      goToPage(currentPage + 1);
+    }
+  });
   
-  // Show empty state initially and hide results table
+  // Initial state setup
   const resultsTable = document.getElementById('resultsTable')!;
   const actionButtons = document.getElementById('actionButtons')!;
   const emptyState = document.getElementById('emptyState')!;
+  const fileCounter = document.getElementById('fileCounter')!;
+  const itemsPerPageSelector = document.getElementById('itemsPerPageSelector')!;
+  const paginationContainer = document.getElementById('paginationContainer')!;
   
   resultsTable.classList.add('hidden');
   actionButtons.classList.add('hidden');
+  fileCounter.classList.add('hidden');
+  itemsPerPageSelector.classList.add('hidden');
+  paginationContainer.classList.add('hidden');
   emptyState.classList.remove('hidden');
   
   debugLog('Application initialized successfully');
@@ -542,8 +1031,29 @@ document.addEventListener('DOMContentLoaded', () => {
   to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .toast-success {
   animation: slideUp 0.3s ease-out forwards;
+}
+
+.toast-error {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.toast-warning {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.toast-info {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 /* Custom transition for removing toast */
@@ -557,5 +1067,207 @@ document.addEventListener('DOMContentLoaded', () => {
 
 .duration-300 {
   transition-duration: 300ms;
+}
+
+/* Progress bar animations */
+#progressBar {
+  transition: width 0.3s ease-out;
+}
+
+/* Disabled state for drop zone */
+#dropZone[style*="opacity: 0.5"] {
+  cursor: not-allowed;
+}
+
+#dropZone[style*="opacity: 0.5"] .browse-button {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Loading states */
+.processing-overlay {
+  position: relative;
+}
+
+.processing-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+
+/* Improved mobile responsiveness for progress card */
+@media (max-width: 640px) {
+  #progressCard {
+    margin: 0 -1rem;
+    border-radius: 0;
+  }
+  
+  .toast-success,
+  .toast-error,
+  .toast-warning,
+  .toast-info {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    width: auto;
+  }
+}
+
+/* Enhanced hover effects */
+.remove-file:hover {
+  transform: scale(1.2);
+  transition: transform 0.2s ease;
+}
+
+/* Better visual feedback for file limits */
+.file-limit-warning {
+  border: 2px solid #fbbf24;
+  background-color: #fef3c7;
+}
+
+/* Pagination styles */
+#paginationContainer button:disabled {
+  cursor: not-allowed;
+}
+
+#paginationContainer button:not(:disabled):hover {
+  background-color: #f8fafc;
+  border-color: #001a72;
+}
+
+.page-button-active {
+  background-color: #001a72 !important;
+  color: white !important;
+  border-color: #001a72 !important;
+}
+
+/* Items per page selector */
+#itemsPerPage {
+  min-width: 60px;
+}
+
+#itemsPerPage:focus {
+  outline: none;
+  border-color: #001a72;
+  box-shadow: 0 0 0 1px #001a72;
+}
+
+/* Mobile pagination styles */
+@media (max-width: 767px) {
+  #paginationContainer {
+    background: #fafbfc;
+  }
+  
+  /* Make prev/next buttons more mobile-friendly */
+  #prevButton,
+  #nextButton {
+    font-weight: 500;
+    background: white;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  #prevButton:not(:disabled):hover,
+  #nextButton:not(:disabled):hover {
+    background: #f8fafc;
+    border-color: #001a72;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  #prevButton:disabled,
+  #nextButton:disabled {
+    background: #f8fafc;
+    color: #94a3b8;
+    border-color: #e2e8f0;
+  }
+  
+  /* Mobile page numbers - smaller and more compact */
+  #pageNumbers {
+    max-width: 60%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  #pageNumbers::-webkit-scrollbar {
+    display: none;
+  }
+  
+  #pageNumbers button {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    min-width: 28px;
+    max-width: 32px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+  
+  /* Mobile select styles */
+  #pageNumbers select {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.375rem;
+    max-width: 80px;
+    flex-shrink: 0;
+  }
+  
+  /* Ensure pagination doesn't overflow */
+  #paginationContainer > div {
+    min-width: 0; /* Allow flex items to shrink */
+  }
+  
+  #paginationInfo {
+    font-size: 0.75rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Desktop specific styles */
+@media (min-width: 768px) {
+  /* Hide mobile-specific elements on desktop */
+  #prevButton svg,
+  #nextButton svg {
+    display: none;
+  }
+}
+
+/* Improved accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin {
+    animation: none;
+  }
+  
+  #progressBar {
+    transition: none;
+  }
+  
+  .toast-success,
+  .toast-error,
+  .toast-warning,
+  .toast-info {
+    animation: none;
+  }
+}
+
+/* Focus styles for better accessibility */
+button:focus,
+input:focus,
+label:focus {
+  outline: 2px solid #001a72;
+  outline-offset: 2px;
+}
+
+/* Enhanced visual feedback for drag and drop */
+#dropZone.drag-over {
+  transform: scale(1.02);
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 </style>
